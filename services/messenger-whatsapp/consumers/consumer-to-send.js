@@ -3,8 +3,9 @@ import axios from "axios";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 const QUEUE_NAME = "messages.to_send";
-const META_API_URL = "https://graph.facebook.com/v22.0/messages";
+const META_API_URL = "https://graph.facebook.com/v22.0/";
 const GRAPH_API_TOKEN = process.env.GRAPH_API_TOKEN;
+const GRAPH_NUMBER_ID = process.env.GRAPH_NUMBER_ID;
 
 (async () => {
     try {
@@ -28,7 +29,7 @@ const GRAPH_API_TOKEN = process.env.GRAPH_API_TOKEN;
 
                     try {
                         const response = await axios.post(
-                            META_API_URL,
+                            `${META_API_URL}/${GRAPH_NUMBER_ID}/messages`,
                             {
                                 messaging_product: "whatsapp",
                                 to: "recipient_phone_number", // Replace with actual recipient
