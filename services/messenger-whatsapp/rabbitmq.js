@@ -1,6 +1,11 @@
 // Create a new file for RabbitMQ connection logic
 import amqp from "amqplib";
 
+console.log("Connecting to RabbitMQ...");
+console.log(process.env.RABBITMQ_URL);
+
+
+
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 
 let channel;
