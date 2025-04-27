@@ -2,8 +2,6 @@
 import amqp from "amqplib";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
-const QUEUE_NAME = "incoming.messages";
-const DLQ_NAME = "dql.incoming.messages";
 
 let channel;
 
@@ -17,23 +15,16 @@ export const connectToRabbitMQ = async () => {
             channel = await connection.createChannel();
 
             // Ensure the Dead Letter Queue exists
-            await channel.assertQueue(DLQ_NAME, {
+            await channel.assertQueue("messages.to_send", {
                 durable: true,
             });
 
-            // Delete the existing queue if it conflicts with the new configuration
-            try {
-                await channel.deleteQueue(QUEUE_NAME);
-            } catch (error) {
-                console.log(`Queue ${QUEUE_NAME} does not exist or cannot be deleted. Proceeding...`);
-            }
-
             // Ensure the main queue exists with DLQ configuration
-            await channel.assertQueue(QUEUE_NAME, {
+            await channel.assertQueue("messages.to_send", {
                 durable: true,
                 arguments: {
                     "x-dead-letter-exchange": "",
-                    "x-dead-letter-routing-key": DLQ_NAME,
+                    "x-dead-letter-routing-key": "messages.to_send",
                 },
             });
 
@@ -49,12 +40,12 @@ export const connectToRabbitMQ = async () => {
     throw new Error("Failed to connect to RabbitMQ after multiple retries.");
 };
 
-export const publishToQueue = (message) => {
+export const publishToQueue = (message, queue_name) => {
     if (!channel) {
         throw new Error("RabbitMQ channel is not initialized.");
     }
 
-    channel.sendToQueue(QUEUE_NAME, Buffer.from(JSON.stringify(message)), {
+    channel.sendToQueue(queue_name, Buffer.from(JSON.stringify(message)), {
         persistent: true, // Ensure message is persistent
     });
     console.log("Message published to RabbitMQ queue.");
