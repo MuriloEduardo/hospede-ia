@@ -11,7 +11,7 @@ const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN }) => {
             try {
                 // Send message via WhatsApp API
                 const response = await axios.post(
-                    "https://graph.facebook.com/v15.0/me/messages",
+                    "https://graph.facebook.com/v22.0/me/messages",
                     {
                         messaging_product: "whatsapp",
                         to: messageContent.to,
