@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const { PORT, GRAPH_API_TOKEN, WEBHOOK_VERIFY_TOKEN } = process.env;
+const { PORT, GRAPH_API_TOKEN, GRAPH_NUMBER_ID, WEBHOOK_VERIFY_TOKEN } = process.env;
 
 (async () => {
     try {
@@ -19,6 +19,7 @@ const { PORT, GRAPH_API_TOKEN, WEBHOOK_VERIFY_TOKEN } = process.env;
         startConsumers({
             rabbitMQChannel,
             GRAPH_API_TOKEN,
+            GRAPH_NUMBER_ID,
         });
     } catch (error) {
         console.error(error);

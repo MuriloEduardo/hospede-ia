@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN }) => {
+const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN, GRAPH_NUMBER_ID }) => {
     console.log("Consumer to send is running...");
 
     rabbitMQChannel.consume("messages.to_send", async (msg) => {
@@ -11,7 +11,7 @@ const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN }) => {
             try {
                 // Send message via WhatsApp API
                 const response = await axios.post(
-                    "https://graph.facebook.com/v22.0/me/messages",
+                    `https://graph.facebook.com/v22.0/${GRAPH_NUMBER_ID}/messages`,
                     {
                         messaging_product: "whatsapp",
                         to: messageContent.to,
