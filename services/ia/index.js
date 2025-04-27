@@ -3,7 +3,7 @@ import amqp from "amqplib";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 const INPUT_QUEUE = "incoming.messages";
-const OUTPUT_QUEUE = "processed.messages";
+const OUTPUT_QUEUE = "messages.to_send";
 
 (async () => {
     let connection, channel;
