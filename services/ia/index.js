@@ -14,7 +14,13 @@ const OUTPUT_QUEUE = "messages.to_send";
 
         // Ensure the input and output queues exist
         await channel.assertQueue(INPUT_QUEUE, { durable: true });
-        await channel.assertQueue(OUTPUT_QUEUE, { durable: true });
+        await channel.assertQueue(OUTPUT_QUEUE, {
+            durable: true,
+            arguments: {
+                "x-dead-letter-exchange": "",
+                "x-dead-letter-routing-key": "messages.to_send",
+            },
+        });
 
         console.log(`Connected to RabbitMQ. Listening on queue: ${INPUT_QUEUE}`);
 

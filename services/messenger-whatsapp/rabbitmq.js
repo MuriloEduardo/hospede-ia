@@ -23,6 +23,11 @@ export const connectToRabbitMQ = async () => {
                 },
             });
 
+            // Ensure the DLQ exists
+            await channel.assertQueue("dql.messages.to_send", {
+                durable: true,
+            });
+
             console.log("Connected to RabbitMQ and queues are ready.");
             return channel;
         } catch (error) {
