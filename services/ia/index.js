@@ -1,12 +1,8 @@
-import dotenv from "dotenv";
-dotenv.config();
-
-console.log("TESTEEEEEEEEEEEEEEEEEEEEEE", process.env.OPENAI_API_KEY);
-
-
 import amqp from "amqplib";
-// import { processMessage } from './aiProcessor.js';
+import dotenv from "dotenv";
+import { processMessage } from './aiProcessor.js';
 
+dotenv.config();
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 const INPUT_QUEUE = "incoming.messages";
 const OUTPUT_QUEUE = "messages.to_send";
