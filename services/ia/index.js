@@ -25,13 +25,13 @@ const OUTPUT_QUEUE = "messages.to_send";
         // Consume messages from the input queue
         channel.consume(
             INPUT_QUEUE,
-            (msg) => {
+            async (msg) => {
                 if (msg !== null) {
                     const messageContent = JSON.parse(msg.content.toString());
                     console.log("Received message:", messageContent);
 
                     // Process the message using the IA module
-                    const processedMessageContent = processMessage(messageContent);
+                    const processedMessageContent = await processMessage(messageContent);
 
                     // Process the message (example: add a processed flag)
                     const processedMessage = {

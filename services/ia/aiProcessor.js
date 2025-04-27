@@ -27,7 +27,6 @@ export const processMessage = async (message) => {
 
     return {
         ...message,
-        response,
         text: { body: agentNextState.messages[agentNextState.messages.length - 1].content },
         timestamp: new Date().toISOString(),
     };
