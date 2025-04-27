@@ -29,13 +29,13 @@ const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN, GRAPH_NUMBER_ID }) =
 
                 console.log("Message sent successfully:", response.data);
 
-                // Acknowledge the message after successful processing
-                rabbitMQChannel.ack(msg);
+
             } catch (error) {
                 console.error("Failed to send message:", error.response?.data || error.message);
-
-                // Reject the message and send it to the DLQ
-                rabbitMQChannel.nack(msg, false, false);
+            } finally {
+                // Acknowledge the message
+                rabbitMQChannel.ack(msg);
+                console.log("Message acknowledged.");
             }
         }
     });
