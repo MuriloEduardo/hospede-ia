@@ -14,6 +14,10 @@ export const connectToRabbitMQ = async () => {
             connection = await amqp.connect(RABBITMQ_URL);
             channel = await connection.createChannel();
 
+            // Ensure the queues exist
+            await channel.assertQueue("incoming.messages", { durable: true });
+            await channel.assertQueue("messages.to_send", { durable: true });
+
             console.log("Connected to RabbitMQ and queues are ready.");
             return channel;
         } catch (error) {
