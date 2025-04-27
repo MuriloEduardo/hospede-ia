@@ -26,29 +26,32 @@ const OUTPUT_QUEUE = "messages.to_send";
         channel.consume(
             INPUT_QUEUE,
             async (msg) => {
-                if (msg !== null) {
-                    const messageContent = JSON.parse(msg.content.toString());
-                    console.log("Received message:", messageContent);
-
-                    // Process the message using the IA module
-                    const processedMessageContent = await processMessage(messageContent);
-
-                    // Process the message (example: add a processed flag)
-                    const processedMessage = {
-                        ...processedMessageContent,
-                        processed: true,
-                        timestamp: new Date().toISOString(),
-                    };
-
-                    // Publish the processed message to the output queue
-                    channel.sendToQueue(OUTPUT_QUEUE, Buffer.from(JSON.stringify(processedMessage)), {
-                        persistent: true,
-                    });
-                    console.log("Published processed message to queue:", OUTPUT_QUEUE);
-
-                    // Acknowledge the message
-                    channel.ack(msg);
+                if (!msg) {
+                    console.log("No message received.");
+                    return;
                 }
+
+                const messageContent = JSON.parse(msg.content.toString());
+                console.log("Received message:", messageContent);
+
+                // Process the message using the IA module
+                const processedMessageContent = await processMessage(messageContent);
+
+                // Process the message (example: add a processed flag)
+                const processedMessage = {
+                    ...processedMessageContent,
+                    processed: true,
+                    timestamp: new Date().toISOString(),
+                };
+
+                // Publish the processed message to the output queue
+                channel.sendToQueue(OUTPUT_QUEUE, Buffer.from(JSON.stringify(processedMessage)), {
+                    persistent: true,
+                });
+                console.log("Published processed message to queue:", OUTPUT_QUEUE);
+
+                // Acknowledge the message
+                channel.ack(msg);
             },
             { noAck: false }
         );
