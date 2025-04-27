@@ -3,6 +3,7 @@ import axios from "axios";
 const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN, GRAPH_NUMBER_ID }) => {
     console.log("Consumer to send is running...");
 
+    // Ensure the queue is not re-declared here
     rabbitMQChannel.consume("messages.to_send", async (msg) => {
         if (msg !== null) {
             const messageContent = JSON.parse(msg.content.toString());

@@ -14,11 +14,6 @@ export const connectToRabbitMQ = async () => {
             connection = await amqp.connect(RABBITMQ_URL);
             channel = await connection.createChannel();
 
-            // Ensure the Dead Letter Queue exists
-            await channel.assertQueue("messages.to_send", {
-                durable: true,
-            });
-
             // Ensure the main queue exists with DLQ configuration
             await channel.assertQueue("messages.to_send", {
                 durable: true,
