@@ -1,6 +1,11 @@
-// Create a new RabbitMQ service for the IA module
+import dotenv from "dotenv";
+dotenv.config();
+
+console.log("TESTEEEEEEEEEEEEEEEEEEEEEE", process.env.OPENAI_API_KEY);
+
+
 import amqp from "amqplib";
-import { processMessage } from './aiProcessor.js'; // Import your IA processing function
+// import { processMessage } from './aiProcessor.js';
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 const INPUT_QUEUE = "incoming.messages";
