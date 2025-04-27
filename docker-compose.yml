@@ -1,0 +1,37 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+  messenger-whatsapp:
+    build:
+      context: ./services/messenger-whatsapp
+    container_name: messenger-whatsapp
+    ports:
+      - "3000:3000"
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq
+      WEBHOOK_VERIFY_TOKEN: your_verify_token
+      GRAPH_API_TOKEN: your_graph_api_token
+      PORT: 3000
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./services/messenger-whatsapp:/usr/src/app
+    command: npx nodemon index.js
+  ia:
+    build:
+      context: ./services/ia
+    container_name: ia-service
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./services/ia:/usr/src/app
+    command: node index.js
