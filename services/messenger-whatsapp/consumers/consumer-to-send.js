@@ -15,9 +15,9 @@ const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN, GRAPH_NUMBER_ID }) =
                     `https://graph.facebook.com/v22.0/${GRAPH_NUMBER_ID}/messages`,
                     {
                         messaging_product: "whatsapp",
-                        to: messageContent.to,
+                        to: messageContent.from,
                         type: "text",
-                        text: { body: messageContent.body },
+                        text: messageContent.text,
                     },
                     {
                         headers: {
@@ -28,8 +28,6 @@ const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN, GRAPH_NUMBER_ID }) =
                 );
 
                 console.log("Message sent successfully:", response.data);
-
-
             } catch (error) {
                 console.error("Failed to send message:", error.response?.data || error.message);
             } finally {
