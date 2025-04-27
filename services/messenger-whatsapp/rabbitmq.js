@@ -3,6 +3,7 @@ import amqp from "amqplib";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 const QUEUE_NAME = "incoming.messages";
+const DLQ_NAME = "dql.incoming.messages";
 
 let channel;
 
@@ -15,12 +16,21 @@ export const connectToRabbitMQ = async () => {
             connection = await amqp.connect(RABBITMQ_URL);
             channel = await connection.createChannel();
 
-            // Ensure the queue exists with durability
-            await channel.assertQueue(QUEUE_NAME, {
+            // Ensure the Dead Letter Queue exists
+            await channel.assertQueue(DLQ_NAME, {
                 durable: true,
             });
 
-            console.log("Connected to RabbitMQ and queue is ready.");
+            // Ensure the main queue exists with DLQ configuration
+            await channel.assertQueue(QUEUE_NAME, {
+                durable: true,
+                arguments: {
+                    "x-dead-letter-exchange": "",
+                    "x-dead-letter-routing-key": DLQ_NAME,
+                },
+            });
+
+            console.log("Connected to RabbitMQ and queues are ready.");
             return channel;
         } catch (error) {
             console.error("Failed to connect to RabbitMQ. Retrying in 5 seconds...", error);
