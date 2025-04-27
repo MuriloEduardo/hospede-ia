@@ -3,7 +3,7 @@ import axios from "axios";
 const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN }) => {
     console.log("Consumer to send is running...");
 
-    rabbitMQChannel.consume("outgoing.messages", async (msg) => {
+    rabbitMQChannel.consume("messages.to_send", async (msg) => {
         if (msg !== null) {
             const messageContent = JSON.parse(msg.content.toString());
             console.log("Processing message:", messageContent);
