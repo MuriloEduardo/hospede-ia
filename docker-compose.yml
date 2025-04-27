@@ -33,6 +33,8 @@ services:
     build:
       context: ./services/messenger-whatsapp
     container_name: messenger-whatsapp
+    ports:
+      - "3000:3000"
     depends_on:
       rabbitmq:
         condition: service_healthy
