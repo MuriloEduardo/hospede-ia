@@ -1,5 +1,6 @@
 // Create a new RabbitMQ service for the IA module
 import amqp from "amqplib";
+import { processMessage } from './aiProcessor.js'; // Import your IA processing function
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 const INPUT_QUEUE = "incoming.messages";
@@ -28,9 +29,12 @@ const OUTPUT_QUEUE = "messages.to_send";
                     const messageContent = JSON.parse(msg.content.toString());
                     console.log("Received message:", messageContent);
 
+                    // Process the message using the IA module
+                    const processedMessageContent = processMessage(messageContent);
+
                     // Process the message (example: add a processed flag)
                     const processedMessage = {
-                        ...messageContent,
+                        ...processedMessageContent,
                         processed: true,
                         timestamp: new Date().toISOString(),
                     };
