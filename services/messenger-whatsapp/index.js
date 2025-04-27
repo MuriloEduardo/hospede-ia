@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { connectToRabbitMQ, publishToQueue } from "./rabbitmq.js";
 import createWebhookRoutes from "./routes/webhookRoutes.js";
+import { startConsumers } from "./consumers/index.js";
 
 dotenv.config();
 
@@ -12,7 +13,13 @@ const { PORT, GRAPH_API_TOKEN, WEBHOOK_VERIFY_TOKEN } = process.env;
 
 (async () => {
     try {
-        await connectToRabbitMQ();
+        const rabbitMQChannel = await connectToRabbitMQ();
+
+        // Start consumers with dependencies
+        startConsumers({
+            rabbitMQChannel,
+            GRAPH_API_TOKEN,
+        });
     } catch (error) {
         console.error(error);
         process.exit(1);

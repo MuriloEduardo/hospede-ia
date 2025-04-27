@@ -1,62 +1,40 @@
-import amqp from "amqplib";
 import axios from "axios";
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
-const QUEUE_NAME = "messages.to_send";
-const META_API_URL = "https://graph.facebook.com/v22.0/";
-const GRAPH_API_TOKEN = process.env.GRAPH_API_TOKEN;
-const GRAPH_NUMBER_ID = process.env.GRAPH_NUMBER_ID;
+const consumerToSend = ({ rabbitMQChannel, GRAPH_API_TOKEN }) => {
+    console.log("Consumer to send is running...");
 
-(async () => {
-    try {
-        const connection = await amqp.connect(RABBITMQ_URL);
-        const channel = await connection.createChannel();
+    rabbitMQChannel.consume("outgoing.messages", async (msg) => {
+        if (msg !== null) {
+            const messageContent = JSON.parse(msg.content.toString());
+            console.log("Processing message:", messageContent);
 
-        // Ensure the queue exists
-        await channel.assertQueue(QUEUE_NAME, {
-            durable: true,
-        });
-
-        console.log("Waiting for messages in queue:", QUEUE_NAME);
-
-        // Consume messages from the queue
-        channel.consume(
-            QUEUE_NAME,
-            async (msg) => {
-                if (msg !== null) {
-                    const messageContent = msg.content.toString();
-                    console.log("Received message:", messageContent);
-
-                    try {
-                        const response = await axios.post(
-                            `${META_API_URL}/${GRAPH_NUMBER_ID}/messages`,
-                            {
-                                messaging_product: "whatsapp",
-                                to: "recipient_phone_number", // Replace with actual recipient
-                                type: "text",
-                                text: { body: messageContent },
-                            },
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${GRAPH_API_TOKEN}`,
-                                },
-                            }
-                        );
-
-                        console.log("Message sent to Meta API:", response.data);
-                    } catch (apiError) {
-                        console.error("Failed to send message to Meta API:", apiError);
+            try {
+                // Send message via WhatsApp API
+                const response = await axios.post(
+                    "https://graph.facebook.com/v15.0/me/messages",
+                    {
+                        messaging_product: "whatsapp",
+                        to: messageContent.to,
+                        type: "text",
+                        text: { body: messageContent.body },
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${GRAPH_API_TOKEN}`,
+                            "Content-Type": "application/json",
+                        },
                     }
+                );
 
-                    // Acknowledge the message
-                    channel.ack(msg);
-                }
-            },
-            {
-                noAck: false, // Ensure messages are acknowledged after processing
+                console.log("Message sent successfully:", response.data);
+            } catch (error) {
+                console.error("Failed to send message:", error.response?.data || error.message);
             }
-        );
-    } catch (error) {
-        console.error("Failed to connect to RabbitMQ or consume messages:", error);
-    }
-})();
+
+            // Acknowledge the message after processing
+            rabbitMQChannel.ack(msg);
+        }
+    });
+};
+
+export default consumerToSend;

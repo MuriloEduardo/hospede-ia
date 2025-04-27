@@ -1,9 +1,13 @@
 import dotenv from "dotenv";
-import './consumer-to-send.js';
+import consumerToSend from "./consumer-to-send.js";
 
 dotenv.config();
 
-console.log(process.env.GRAPH_NUMBER_ID);
+export const startConsumers = (dependencies) => {
+    console.log("Starting consumers...");
 
+    // Pass dependencies to each consumer
+    consumerToSend(dependencies);
 
-console.log("All consumers are now running.");
+    console.log("All consumers are now running.");
+};
