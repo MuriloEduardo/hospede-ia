@@ -21,6 +21,13 @@ export const connectToRabbitMQ = async () => {
                 durable: true,
             });
 
+            // Delete the existing queue if it conflicts with the new configuration
+            try {
+                await channel.deleteQueue(QUEUE_NAME);
+            } catch (error) {
+                console.log(`Queue ${QUEUE_NAME} does not exist or cannot be deleted. Proceeding...`);
+            }
+
             // Ensure the main queue exists with DLQ configuration
             await channel.assertQueue(QUEUE_NAME, {
                 durable: true,
