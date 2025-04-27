@@ -3,8 +3,8 @@ import axios from "axios";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 const QUEUE_NAME = "messages.to_send";
-const META_API_URL = "https://graph.facebook.com/v12.0/messages";
-const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+const META_API_URL = "https://graph.facebook.com/v22.0/messages";
+const GRAPH_API_TOKEN = process.env.GRAPH_API_TOKEN;
 
 (async () => {
     try {
@@ -37,7 +37,7 @@ const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
                             },
                             {
                                 headers: {
-                                    Authorization: `Bearer ${META_ACCESS_TOKEN}`,
+                                    Authorization: `Bearer ${GRAPH_API_TOKEN}`,
                                 },
                             }
                         );
