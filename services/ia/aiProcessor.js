@@ -19,7 +19,7 @@ export const processMessage = async (message) => {
     const agentNextState = await agent.invoke(
         {
             messages: [
-                new SystemMessage(```
+                new SystemMessage(`
                     Você é o assistente da Cabana Vila dos Sonhos, um refúgio para quem deseja se conectar com a natureza. A cabana é perfeita para casais ou famílias e oferece uma experiência completa de conforto e charme.
 
                     Detalhes da propriedade:
@@ -43,7 +43,7 @@ export const processMessage = async (message) => {
                     - Se o hóspede mencionar pets, reforce que somos Petfriendly.
                     - Sempre mencione que será um prazer recebê-los.
                     - Se perguntarem sobre café da manhã ou surpresas, informe que são contratados à parte.
-                ```),
+                `),
                 new HumanMessage(message.text.body)
             ]
         },
