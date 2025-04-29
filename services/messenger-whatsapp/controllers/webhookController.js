@@ -1,6 +1,3 @@
-// Create a new file for webhook controllers
-import axios from "axios";
-
 export const createWebhookController = ({ publishToQueue }) => {
     const handleWebhookPost = async (req, res) => {
         console.log("Incoming webhook message...");

@@ -1,17 +1,28 @@
 import amqp from "amqplib";
 import dotenv from "dotenv";
-import { processMessage } from './aiProcessor.js';
+import express from "express";
+import createRoutes from "./http.js";
+import { processMessage } from './services/aiProcessor.js';
 
 dotenv.config();
-const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
-const INPUT_QUEUE = "incoming.messages";
-const OUTPUT_QUEUE = "messages.to_send";
+
+const app = express();
+
+app.use(express.json());
+app.use(createRoutes());
+
+app.listen(process.env.PORT || 4000, () => {
+    console.log(`Server is listening on port: ${process.env.PORT || 4000}`);
+});
 
 (async () => {
+    const INPUT_QUEUE = "incoming.messages";
+    const OUTPUT_QUEUE = "messages.to_send";
+
     let connection, channel;
 
     try {
-        connection = await amqp.connect(RABBITMQ_URL);
+        connection = await amqp.connect(process.env.RABBITMQ_URL || "amqp://localhost");
         channel = await connection.createChannel();
 
         // Ensure the input and output queues exist
