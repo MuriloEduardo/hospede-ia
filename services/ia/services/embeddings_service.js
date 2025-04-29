@@ -36,7 +36,7 @@ export class EmbeddingsService {
 
         const document = {
             pageContent,
-            metadata: {},
+            metadata: { businessPhoneId },
         };
 
         const ids = [uuidv4()];

@@ -16,7 +16,7 @@ export default async () => {
             res.sendStatus(200);
         } catch (error) {
             console.error("Error adding documents to the vector database:", error);
-            res.status(500).json({ error: "Failed to add documents" });
+            res.status(500).json({ error: "Failed to add documents", details: error.message });
         }
     });
 
