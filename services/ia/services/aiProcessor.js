@@ -4,18 +4,12 @@ import {
     MessagesPlaceholder,
 } from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
-import { RunnableWithMessageHistory } from "@langchain/core/runnables";
+import { RunnableWithMessageHistory, RunnablePassthrough } from "@langchain/core/runnables";
 import { PostgresChatMessageHistory } from "@langchain/community/stores/message/postgres";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
 export const processMessage = async (message) => {
-    const prompt = ChatPromptTemplate.fromMessages([
-        new MessagesPlaceholder("chat_history"),
-        ["system", "Use the following documents to help answer: {similar_documents}"],
-        ["human", "{input}"],
-    ]);
-
     const pool = new pg.Pool({
         host: "localhost",
         port: 5432,
@@ -28,7 +22,7 @@ export const processMessage = async (message) => {
         model: "text-embedding-3-small",
     });
 
-    const vectorStoreConfig = {
+    const vectorStore = await PGVectorStore.initialize(embeddings, {
         postgresConnectionOptions: {
             type: "postgres",
             host: "localhost",
@@ -45,33 +39,50 @@ export const processMessage = async (message) => {
             metadataColumnName: "metadata",
         },
         distanceStrategy: "cosine",
-    };
+    });
 
-    const vectorStore = await PGVectorStore.initialize(embeddings, vectorStoreConfig);
+    const retriever = vectorStore.asRetriever({ k: 3 });
 
-    // Perform similarity search
-    const query = message.text.body;
-    const similarDocuments = await vectorStore.similaritySearch(query, 3); // Retrieve top 3 similar documents
-    const similarDocsText = similarDocuments.map((doc) => doc.pageContent).join("\n\n");
+    // Prompt que inclui o contexto automaticamente
+    const prompt = ChatPromptTemplate.fromMessages([
+        new MessagesPlaceholder("chat_history"),
+        ["system", "Use the following retrieved documents to help answer the question:\n\n{context}"],
+        ["human", "{input}"],
+    ]);
 
-    console.log("Similar documents:", similarDocuments);
+    const model = new ChatOpenAI({ temperature: 0 });
 
+    // Agora criamos um "runnable" que primeiro faz o search
+    const ragChain = RunnablePassthrough.assign({
+        context: async (input) => {
+            const docs = await retriever.invoke(input.input);
+            return docs.map((doc) => doc.pageContent).join("\n\n");
+        },
+    }).pipe(prompt).pipe(model);
+
+    // Adicionamos a memória no runnable
     const chainWithHistory = new RunnableWithMessageHistory({
-        runnable: prompt.pipe(new ChatOpenAI({ temperature: 0 })),
+        runnable: ragChain,
         inputMessagesKey: "input",
         historyMessagesKey: "chat_history",
         getMessageHistory: async (sessionId) => {
-            const chatHistory = new PostgresChatMessageHistory({
+            return new PostgresChatMessageHistory({
                 sessionId,
                 pool,
             });
-            return chatHistory;
         },
     });
 
     const response = await chainWithHistory.invoke(
-        { input: message.text.body, similar_documents: similarDocsText, },
-        { configurable: { thread_id: message.from, sessionId: message.from } },
+        {
+            input: message.text.body,
+        },
+        {
+            configurable: {
+                thread_id: message.from,
+                sessionId: message.from,
+            },
+        }
     );
 
     await pool.end();
