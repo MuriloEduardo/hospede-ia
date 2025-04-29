@@ -1,4 +1,7 @@
+// Importa o módulo pg para conexão com o banco de dados PostgreSQL
 import pg from "pg";
+
+// Importa classes e funções do LangChain para prompts e processamento de mensagens
 import {
     ChatPromptTemplate,
     MessagesPlaceholder,
@@ -9,7 +12,13 @@ import { PostgresChatMessageHistory } from "@langchain/community/stores/message/
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
+/**
+ * Função principal para processar mensagens recebidas.
+ * @param {Object} message - Mensagem recebida contendo informações como texto e remetente.
+ * @returns {Object} - Mensagem processada com resposta gerada e timestamp.
+ */
 export const processMessage = async (message) => {
+    // Cria um pool de conexões com o banco de dados PostgreSQL
     const pool = new pg.Pool({
         host: "postgres",
         port: 5432,
@@ -18,10 +27,12 @@ export const processMessage = async (message) => {
         database: "postgres",
     });
 
+    // Configura embeddings usando o modelo OpenAI
     const embeddings = new OpenAIEmbeddings({
         model: "text-embedding-3-small",
     });
 
+    // Inicializa o VectorStore para armazenar e recuperar vetores
     const vectorStore = await PGVectorStore.initialize(embeddings, {
         postgresConnectionOptions: {
             type: "postgres",
@@ -41,18 +52,20 @@ export const processMessage = async (message) => {
         distanceStrategy: "cosine",
     });
 
+    // Configura o retriever para buscar os documentos mais relevantes
     const retriever = vectorStore.asRetriever({ k: 3 });
 
-    // Prompt que inclui o contexto automaticamente
+    // Define o template do prompt para incluir contexto automaticamente
     const prompt = ChatPromptTemplate.fromMessages([
         new MessagesPlaceholder("chat_history"),
-        ["system", "Use the following retrieved documents to help answer the question:\n\n{context}"],
+        ["system", "{context}"],
         ["human", "{input}"],
     ]);
 
+    // Configura o modelo de linguagem OpenAI
     const model = new ChatOpenAI({});
 
-    // Agora criamos um "runnable" que primeiro faz o search
+    // Cria um "runnable" que primeiro realiza a busca e depois processa o prompt
     const ragChain = RunnablePassthrough.assign({
         context: async (input) => {
             const docs = await retriever.invoke(input.input);
@@ -60,7 +73,7 @@ export const processMessage = async (message) => {
         },
     }).pipe(prompt).pipe(model);
 
-    // Adicionamos a memória no runnable
+    // Adiciona histórico de mensagens ao "runnable"
     const chainWithHistory = new RunnableWithMessageHistory({
         runnable: ragChain,
         inputMessagesKey: "input",
@@ -73,6 +86,7 @@ export const processMessage = async (message) => {
         },
     });
 
+    // Processa a mensagem recebida e gera uma resposta
     const response = await chainWithHistory.invoke(
         {
             input: message.text.body,
@@ -85,8 +99,10 @@ export const processMessage = async (message) => {
         }
     );
 
+    // Encerra o pool de conexões com o banco de dados
     await pool.end();
 
+    // Retorna a mensagem processada com a resposta gerada e o timestamp
     return {
         ...message,
         text: { body: response.content },
