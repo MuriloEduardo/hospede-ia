@@ -53,7 +53,7 @@ export const processMessage = async (message) => {
     });
 
     // Configura o retriever para buscar os documentos mais relevantes
-    const retriever = vectorStore.asRetriever({ k: 3 });
+    const retriever = vectorStore.asRetriever({ k: 3, filter: { businessPhoneId: message.from } });
 
     // Define o template do prompt para incluir contexto automaticamente
     const prompt = ChatPromptTemplate.fromMessages([
