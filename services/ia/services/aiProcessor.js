@@ -50,7 +50,7 @@ export const processMessage = async (message) => {
         ["human", "{input}"],
     ]);
 
-    const model = new ChatOpenAI({ temperature: 0 });
+    const model = new ChatOpenAI({});
 
     // Agora criamos um "runnable" que primeiro faz o search
     const ragChain = RunnablePassthrough.assign({
