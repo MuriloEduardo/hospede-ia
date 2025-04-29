@@ -17,7 +17,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
  * @param {Object} message - Mensagem recebida contendo informações como texto e remetente.
  * @returns {Object} - Mensagem processada com resposta gerada e timestamp.
  */
-export const processMessage = async (entry) => {
+export const processMessage = async ({ entry }) => {
     // Cria um pool de conexões com o banco de dados PostgreSQL
     const pool = new pg.Pool({
         host: "postgres",
