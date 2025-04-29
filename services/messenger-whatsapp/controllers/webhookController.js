@@ -8,7 +8,7 @@ export const createWebhookController = ({ publishToQueue }) => {
 
         if (message?.type === "text") {
             try {
-                publishToQueue(message, "incoming.messages");
+                publishToQueue(req.body, "incoming.messages");
             } catch (error) {
                 console.error("Failed to publish message to RabbitMQ:", error);
             }
