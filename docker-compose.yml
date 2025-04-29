@@ -63,6 +63,8 @@ services:
       timeout: 5s
       retries: 5
     user: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 networks:
   default:
