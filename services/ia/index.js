@@ -35,19 +35,13 @@ app.listen(process.env.PORT || 4000, () => {
             durable: true
         });
 
-        console.log(`Connected to RabbitMQ. Listening on queue: ${INPUT_QUEUE}`);
-
         // Consume messages from the input queue
         channel.consume(
             INPUT_QUEUE,
             async (msg) => {
-                if (!msg) {
-                    console.log("No message received.");
-                    return;
-                }
+                if (!msg) return;
 
                 const entry = JSON.parse(msg.content.toString());
-                console.log("Received message:", entry);
 
                 // Process the message using the IA module
                 const processedMessageContent = await processMessage(entry);
@@ -63,7 +57,6 @@ app.listen(process.env.PORT || 4000, () => {
                 channel.sendToQueue(OUTPUT_QUEUE, Buffer.from(JSON.stringify(processedMessage)), {
                     persistent: true,
                 });
-                console.log("Published processed message to queue:", OUTPUT_QUEUE);
 
                 // Acknowledge the message
                 channel.ack(msg);

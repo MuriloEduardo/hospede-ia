@@ -1,10 +1,6 @@
 export const createWebhookController = ({ publishToQueue }) => {
     const handleWebhookPost = async (req, res) => {
-        console.log("Incoming webhook message...", req.body);
-
         const message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
-
-        console.log(JSON.stringify(req.body, null, 2));
 
         if (message?.type === "text") {
             try {
@@ -24,7 +20,6 @@ export const createWebhookController = ({ publishToQueue }) => {
 
         if (mode === "subscribe" && token === process.env.WEBHOOK_VERIFY_TOKEN) {
             res.status(200).send(challenge);
-            console.log("Webhook verified successfully!");
         } else {
             res.sendStatus(403);
         }

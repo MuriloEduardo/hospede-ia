@@ -52,10 +52,12 @@ export const processMessage = async (entry) => {
         distanceStrategy: "cosine",
     });
 
-    message = entry?.[0]?.changes[0]?.value?.messages?.[0]
+    const value_message = entry?.[0]?.changes[0]?.value
+    const message = value_message?.messages?.[0]
+    const metadata = value_message?.metadata
 
     // Configura o retriever para buscar os documentos mais relevantes
-    const retriever = vectorStore.asRetriever({ k: 3, filter: { businessPhoneId: message.from } });
+    const retriever = vectorStore.asRetriever({ k: 3, filter: { businessPhoneId: metadata.display_phone_number } });
 
     // Define o template do prompt para incluir contexto automaticamente
     const prompt = ChatPromptTemplate.fromMessages([

@@ -30,8 +30,6 @@ export class EmbeddingsService {
     }
 
     addDocuments = async (businessPhoneId, pageContents) => {
-        console.log("Adding documents to the vector database:", this.config);
-
         const vectorStore = await PGVectorStore.initialize(this.embeddings, this.config);
 
         const documents = pageContents.map(pageContent => ({

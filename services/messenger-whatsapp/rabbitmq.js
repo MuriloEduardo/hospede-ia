@@ -17,7 +17,6 @@ export const connectToRabbitMQ = async () => {
             await channel.assertQueue("incoming.messages", { durable: true });
             await channel.assertQueue("messages.to_send", { durable: true });
 
-            console.log("Connected to RabbitMQ and queues are ready.");
             return channel;
         } catch (error) {
             console.error("Failed to connect to RabbitMQ. Retrying in 5 seconds...", error);
@@ -37,5 +36,4 @@ export const publishToQueue = (message, queue_name) => {
     channel.sendToQueue(queue_name, Buffer.from(JSON.stringify(message)), {
         persistent: true, // Ensure message is persistent
     });
-    console.log("Message published to RabbitMQ queue.");
 };
