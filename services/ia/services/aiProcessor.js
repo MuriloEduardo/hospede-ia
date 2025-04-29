@@ -12,6 +12,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 export const processMessage = async (message) => {
     const prompt = ChatPromptTemplate.fromMessages([
         new MessagesPlaceholder("chat_history"),
+        ["system", "Use the following documents to help answer: {similar_documents}"],
         ["human", "{input}"],
     ]);
 
@@ -51,6 +52,7 @@ export const processMessage = async (message) => {
     // Perform similarity search
     const query = message.text.body;
     const similarDocuments = await vectorStore.similaritySearch(query, 3); // Retrieve top 3 similar documents
+    const similarDocsText = similarDocuments.map((doc) => doc.pageContent).join("\n\n");
 
     console.log("Similar documents:", similarDocuments);
 
@@ -68,7 +70,7 @@ export const processMessage = async (message) => {
     });
 
     const response = await chainWithHistory.invoke(
-        { input: message.text.body },
+        { input: message.text.body, similar_documents: similarDocsText, },
         { configurable: { thread_id: message.from, sessionId: message.from } },
     );
 
