@@ -11,7 +11,7 @@ export class EmbeddingsService {
         this.config = {
             postgresConnectionOptions: {
                 type: "postgres",
-                host: "localhost",
+                host: "postgres",
                 port: 5432,
                 user: "postgres",
                 password: "postgres",

@@ -11,7 +11,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 
 export const processMessage = async (message) => {
     const pool = new pg.Pool({
-        host: "localhost",
+        host: "postgres",
         port: 5432,
         user: "postgres",
         password: "postgres",
@@ -25,7 +25,7 @@ export const processMessage = async (message) => {
     const vectorStore = await PGVectorStore.initialize(embeddings, {
         postgresConnectionOptions: {
             type: "postgres",
-            host: "localhost",
+            host: "postgres",
             port: 5432,
             user: "postgres",
             password: "postgres",
