@@ -17,7 +17,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
  * @param {Object} message - Mensagem recebida contendo informações como texto e remetente.
  * @returns {Object} - Mensagem processada com resposta gerada e timestamp.
  */
-export const processMessage = async (message) => {
+export const processMessage = async (entry) => {
     // Cria um pool de conexões com o banco de dados PostgreSQL
     const pool = new pg.Pool({
         host: "postgres",
@@ -51,6 +51,8 @@ export const processMessage = async (message) => {
         },
         distanceStrategy: "cosine",
     });
+
+    message = entry?.[0]?.changes[0]?.value?.messages?.[0]
 
     // Configura o retriever para buscar os documentos mais relevantes
     const retriever = vectorStore.asRetriever({ k: 3, filter: { businessPhoneId: message.from } });

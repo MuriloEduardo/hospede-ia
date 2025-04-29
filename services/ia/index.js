@@ -46,11 +46,11 @@ app.listen(process.env.PORT || 4000, () => {
                     return;
                 }
 
-                const messageContent = JSON.parse(msg.content.toString());
-                console.log("Received message:", messageContent);
+                const entry = JSON.parse(msg.content.toString());
+                console.log("Received message:", entry);
 
                 // Process the message using the IA module
-                const processedMessageContent = await processMessage(messageContent);
+                const processedMessageContent = await processMessage(entry);
 
                 // Process the message (example: add a processed flag)
                 const processedMessage = {

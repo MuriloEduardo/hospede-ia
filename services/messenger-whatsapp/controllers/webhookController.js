@@ -1,10 +1,10 @@
 export const createWebhookController = ({ publishToQueue }) => {
     const handleWebhookPost = async (req, res) => {
-        console.log("Incoming webhook message...");
+        console.log("Incoming webhook message...", req.body);
 
         const message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
 
-        console.log(JSON.stringify(message, null, 2));
+        console.log(JSON.stringify(req.body, null, 2));
 
         if (message?.type === "text") {
             try {
