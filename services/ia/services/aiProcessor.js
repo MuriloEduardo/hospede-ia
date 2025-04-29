@@ -63,7 +63,9 @@ export const processMessage = async (message) => {
     ]);
 
     // Configura o modelo de linguagem OpenAI
-    const model = new ChatOpenAI({});
+    const model = new ChatOpenAI({
+        temperature: 0,
+    });
 
     // Cria um "runnable" que primeiro realiza a busca e depois processa o prompt
     const ragChain = RunnablePassthrough.assign({
