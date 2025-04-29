@@ -8,10 +8,9 @@ export default async () => {
         const embeddingsService = new EmbeddingsService();
 
         const { businessPhoneId } = req.params;
-        const { pageContent } = req.body;
 
         try {
-            await embeddingsService.addDocuments(businessPhoneId, pageContent)
+            await embeddingsService.addDocuments(businessPhoneId, req.body)
 
             res.sendStatus(200);
         } catch (error) {

@@ -29,20 +29,18 @@ export class EmbeddingsService {
         };
     }
 
-    addDocuments = async (businessPhoneId, pageContent) => {
+    addDocuments = async (businessPhoneId, pageContents) => {
         console.log("Adding documents to the vector database:", this.config);
 
         const vectorStore = await PGVectorStore.initialize(this.embeddings, this.config);
 
-        const document = {
+        const documents = pageContents.map(pageContent => ({
             pageContent,
             metadata: { businessPhoneId },
-        };
+        }));
 
-        const ids = [uuidv4()];
+        const ids = documents.map(() => uuidv4());
 
-        const result = await vectorStore.addDocuments([document], { ids: ids });
-
-        return { result };
+        await vectorStore.addDocuments(documents, { ids: ids });
     }
 }
