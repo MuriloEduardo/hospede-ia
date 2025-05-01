@@ -42,10 +42,8 @@ spec:
           name: rabbitmq
           ports:
             - containerPort: 5672
-              hostPort: 5672
               protocol: TCP
             - containerPort: 15672
-              hostPort: 15672
               protocol: TCP
           resources: {}
       restartPolicy: Always

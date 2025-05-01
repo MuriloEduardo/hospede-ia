@@ -37,7 +37,6 @@ spec:
           name: messenger-whatsapp
           ports:
             - containerPort: 3000
-              hostPort: 3000
               protocol: TCP
           resources: {}
       restartPolicy: Always
