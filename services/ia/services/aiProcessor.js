@@ -18,19 +18,37 @@ import { OpenAIEmbeddings } from "@langchain/openai";
  * @returns {Object} - Mensagem processada com resposta gerada e timestamp.
  */
 export const processMessage = async ({ entry }) => {
-    // Cria um pool de conexões com o banco de dados PostgreSQL
+    // Configurações adicionais para tornar a conexão mais robusta em produção
     const pool = new pg.Pool({
         host: "postgres",
         port: 5432,
         user: "postgres",
         password: "postgres",
         database: "postgres",
+        max: 20, // Número máximo de conexões no pool
+        idleTimeoutMillis: 30000, // Tempo limite para liberar conexões inativas (30 segundos)
+        connectionTimeoutMillis: 2000, // Tempo limite para aguardar uma conexão (2 segundos)
+        ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false, // Habilitar SSL em produção
+        application_name: "hospede-ia", // Nome da aplicação para monitoramento
+        keepAlive: true, // Mantém conexões ativas
     });
 
     pool.on("error", (err) => {
         console.error("Unexpected error on idle client", err);
         process.exit(-1);
     });
+
+    // Configurações adicionais para tempo limite de consultas
+    const client = await pool.connect();
+    try {
+        await client.query(`SET statement_timeout = 5000;`); // Tempo limite para consultas SQL (5 segundos)
+        await client.query(`SET query_timeout = 5000;`); // Tempo limite para consultas específicas (5 segundos)
+    } catch (err) {
+        console.error("Erro ao configurar timeouts de consulta", err);
+        throw err;
+    } finally {
+        client.release();
+    }
 
     // Configura embeddings usando o modelo OpenAI
     const embeddings = new OpenAIEmbeddings({
