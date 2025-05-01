@@ -32,13 +32,14 @@ spec:
               value: guest
           image: rabbitmq:3-management
           livenessProbe:
-            httpGet:
-              path: /api/health/checks/alarms
-              port: 15672
-              scheme: HTTP
-            failureThreshold: 5
+            exec:
+              command:
+                - rabbitmqctl
+                - status
+            initialDelaySeconds: 20
             periodSeconds: 10
             timeoutSeconds: 5
+            failureThreshold: 3
           name: rabbitmq
           ports:
             - containerPort: 5672
