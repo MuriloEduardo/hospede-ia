@@ -41,9 +41,8 @@ export const processMessage = async ({ entry }) => {
     const client = await pool.connect();
     try {
         await client.query(`SET statement_timeout = 5000;`); // Tempo limite para consultas SQL (5 segundos)
-        await client.query(`SET query_timeout = 5000;`); // Tempo limite para consultas específicas (5 segundos)
     } catch (err) {
-        console.error("Erro ao configurar timeouts de consulta", err);
+        console.error("Erro ao configurar statement_timeout", err);
         throw err;
     } finally {
         client.release();
