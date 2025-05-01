@@ -38,7 +38,7 @@ spec:
               value: "4000"
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
-          image: ia
+          image: muriloeduardo/ia:latest
           name: ia
           ports:
             - containerPort: 4000

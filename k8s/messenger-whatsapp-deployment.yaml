@@ -33,7 +33,7 @@ spec:
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
             - name: WEBHOOK_VERIFY_TOKEN
-          image: messenger-whatsapp
+          image: muriloeduardo/messenger-whatsapp:latest
           name: messenger-whatsapp
           ports:
             - containerPort: 3000
