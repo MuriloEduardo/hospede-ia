@@ -28,7 +28,6 @@ export const processMessage = async ({ entry }) => {
         max: 20, // Número máximo de conexões no pool
         idleTimeoutMillis: 30000, // Tempo limite para liberar conexões inativas (30 segundos)
         connectionTimeoutMillis: 2000, // Tempo limite para aguardar uma conexão (2 segundos)
-        ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false, // Habilitar SSL em produção
         application_name: "hospede-ia", // Nome da aplicação para monitoramento
         keepAlive: true, // Mantém conexões ativas
     });
