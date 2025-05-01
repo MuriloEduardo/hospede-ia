@@ -27,10 +27,56 @@ export const processMessage = async ({ entry }) => {
         database: "postgres",
     });
 
+    pool.on("error", (err) => {
+        console.error("Unexpected error on idle client", err);
+        process.exit(-1);
+    });
+
     // Configura embeddings usando o modelo OpenAI
     const embeddings = new OpenAIEmbeddings({
         model: "text-embedding-3-small",
     });
+
+    // Check if the embeddings table exists before initializing PGVectorStore
+    const ensureEmbeddingsTable = async () => {
+        const client = await pool.connect();
+        try {
+            const tableExistsQuery = `
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_name = 'embeddings'
+                );
+            `;
+            const res = await client.query(tableExistsQuery);
+            if (!res.rows[0].exists) {
+                await PGVectorStore.ensureTableInDatabase(embeddings, {
+                    postgresConnectionOptions: {
+                        type: "postgres",
+                        host: "postgres",
+                        port: 5432,
+                        user: "postgres",
+                        password: "postgres",
+                        database: "postgres",
+                    },
+                    tableName: "embeddings",
+                    columns: {
+                        idColumnName: "id",
+                        vectorColumnName: "vector",
+                        contentColumnName: "content",
+                        metadataColumnName: "metadata",
+                    },
+                    distanceStrategy: "cosine",
+                });
+            }
+        } catch (err) {
+            console.error("Error ensuring embeddings table", err);
+            throw err;
+        } finally {
+            client.release();
+        }
+    };
+
+    await ensureEmbeddingsTable();
 
     // Inicializa o VectorStore para armazenar e recuperar vetores
     const vectorStore = await PGVectorStore.initialize(embeddings, {
