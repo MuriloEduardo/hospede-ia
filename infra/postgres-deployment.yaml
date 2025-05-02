@@ -25,6 +25,8 @@ spec:
         io.kompose.network/infra-default: "true"
         io.kompose.service: postgres
     spec:
+      securityContext:
+        fsGroup: 999
       containers:
         - env:
             - name: POSTGRES_DB
@@ -59,7 +61,6 @@ spec:
           securityContext:
             runAsUser: 999
             runAsGroup: 999
-            fsGroup: 999
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-data
