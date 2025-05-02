@@ -48,15 +48,14 @@ export const processMessage = async ({ entry }) => {
         client.release();
     }
 
-    // Configura embeddings usando o modelo OpenAI
-    const embeddings = new OpenAIEmbeddings({
-        model: "text-embedding-3-small",
-    });
-
-    // Check if the embeddings table exists before initializing PGVectorStore
+    // Check if the embeddings table exists and create it if it doesn't
     const ensureEmbeddingsTable = async () => {
         const client = await pool.connect();
         try {
+            // Enable the vector extension if it's not already enabled
+            await client.query('CREATE EXTENSION IF NOT EXISTS vector;');
+
+            // Check if the table exists
             const tableExistsQuery = `
                 SELECT EXISTS (
                     SELECT FROM information_schema.tables 
@@ -64,28 +63,21 @@ export const processMessage = async ({ entry }) => {
                 );
             `;
             const res = await client.query(tableExistsQuery);
+            
             if (!res.rows[0].exists) {
-                await PGVectorStore.ensureTableInDatabase(embeddings, {
-                    postgresConnectionOptions: {
-                        type: "postgres",
-                        host: "postgres",
-                        port: 5432,
-                        user: "postgres",
-                        password: "postgres",
-                        database: "postgres",
-                    },
-                    tableName: "embeddings",
-                    columns: {
-                        idColumnName: "id",
-                        vectorColumnName: "vector",
-                        contentColumnName: "content",
-                        metadataColumnName: "metadata",
-                    },
-                    distanceStrategy: "cosine",
-                });
+                // Create the embeddings table with the required schema
+                const createTableQuery = `
+                    CREATE TABLE embeddings (
+                        id TEXT PRIMARY KEY,
+                        content TEXT,
+                        metadata JSONB,
+                        vector vector(1536)
+                    );
+                `;
+                await client.query(createTableQuery);
             }
         } catch (err) {
-            console.error("Error ensuring embeddings table", err);
+            console.error("Error ensuring embeddings table:", err);
             throw err;
         } finally {
             client.release();
@@ -93,6 +85,11 @@ export const processMessage = async ({ entry }) => {
     };
 
     await ensureEmbeddingsTable();
+
+    // Configura embeddings usando o modelo OpenAI
+    const embeddings = new OpenAIEmbeddings({
+        model: "text-embedding-3-small",
+    });
 
     // Inicializa o VectorStore para armazenar e recuperar vetores
     const vectorStore = await PGVectorStore.initialize(embeddings, {
