@@ -32,13 +32,17 @@ spec:
               value: guest
           image: rabbitmq:3-management
           livenessProbe:
-            exec:
-              command:
-                - rabbitmqctl
-                - status
-            failureThreshold: 5
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 30
+            periodSeconds: 10
           name: rabbitmq
           ports:
             - containerPort: 5672
