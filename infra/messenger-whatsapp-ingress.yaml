@@ -6,13 +6,12 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: messenger-whatsapp.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: messenger-whatsapp
-            port:
-              number: 3000
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: messenger-whatsapp
+                port:
+                  number: 3000
