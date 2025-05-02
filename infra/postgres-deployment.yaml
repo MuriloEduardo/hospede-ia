@@ -33,6 +33,8 @@ spec:
               value: postgres
             - name: POSTGRES_USER
               value: postgres
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           image: ankane/pgvector
           livenessProbe:
             exec:
@@ -54,6 +56,10 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "200m"
+          securityContext:
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-data
