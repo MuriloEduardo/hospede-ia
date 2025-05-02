@@ -33,6 +33,11 @@ spec:
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
             - name: WEBHOOK_VERIFY_TOKEN
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
           image: muriloeduardo/messenger-whatsapp:latest
           name: messenger-whatsapp
           ports:

@@ -38,6 +38,11 @@ spec:
               value: "4000"
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
           image: muriloeduardo/ia:latest
           name: ia
           ports:
