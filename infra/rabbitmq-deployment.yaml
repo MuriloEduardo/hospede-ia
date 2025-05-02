@@ -13,7 +13,8 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: rabbitmq
-  strategy: {}
+  strategy:
+    type: Recreate
   template:
     metadata:
       annotations:
@@ -25,30 +26,20 @@ spec:
         io.kompose.service: rabbitmq
     spec:
       containers:
-        - env:
+        - name: rabbitmq
+          image: rabbitmq:3.12-management
+          env:
             - name: RABBITMQ_DEFAULT_PASS
               value: guest
             - name: RABBITMQ_DEFAULT_USER
               value: guest
-          image: rabbitmq:3-management
-          livenessProbe:
-            tcpSocket:
-              port: 5672
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
-          readinessProbe:
-            tcpSocket:
-              port: 5672
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          name: rabbitmq
+            - name: RABBITMQ_DEFAULT_VHOST
+              value: /
           ports:
             - containerPort: 5672
-              protocol: TCP
+              name: amqp
             - containerPort: 15672
-              protocol: TCP
+              name: management
           resources:
             requests:
               memory: "256Mi"
@@ -56,5 +47,35 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "200m"
+          volumeMounts:
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq
+          livenessProbe:
+            tcpSocket:
+              port: amqp
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: amqp
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: rabbitmq-data-pvc
       restartPolicy: Always
 status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
