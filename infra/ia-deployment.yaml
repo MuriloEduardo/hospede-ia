@@ -47,6 +47,7 @@ spec:
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
           image: muriloeduardo/ia
+          imagePullPolicy: Always
           name: ia
           ports:
             - containerPort: 4000
