@@ -10,6 +10,8 @@ const app = express();
 
 app.use(express.json());
 
+app.get('/', (req, res) => res.status(200).send('ok'));
+
 (async () => {
     const router = await createRouter();
     app.use("/api", router);

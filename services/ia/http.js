@@ -19,7 +19,5 @@ export default async () => {
         }
     });
 
-    router.get('/', (req, res) => res.status(200).send('ok'));
-
     return router;
 };
