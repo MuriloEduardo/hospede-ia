@@ -1,13 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
+  name: postgres
   labels:
     io.kompose.service: postgres
-  name: postgres
 spec:
   replicas: 1
   selector:
@@ -17,43 +13,37 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.31.2 (a92241f79)
-      creationTimestamp: null
       labels:
-        io.kompose.network/hospede-ia-default: "true"
         io.kompose.service: postgres
     spec:
       containers:
-        - env:
-            - name: POSTGRES_DB
+        - name: postgres
+          image: ankane/pgvector
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
               value: postgres
             - name: POSTGRES_PASSWORD
               value: postgres
-            - name: POSTGRES_USER
+            - name: POSTGRES_DB
               value: postgres
-          image: ankane/pgvector
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
           livenessProbe:
             exec:
               command:
                 - pg_isready
                 - -U
                 - postgres
-            failureThreshold: 5
+            initialDelaySeconds: 20
             periodSeconds: 10
             timeoutSeconds: 5
-          name: postgres
-          ports:
-            - containerPort: 5432
-              protocol: TCP
-          resources: {}
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: postgres-data
-      restartPolicy: Always
+            failureThreshold: 5
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-data
-status: {}
