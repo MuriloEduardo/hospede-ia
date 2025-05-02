@@ -1,9 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
   labels:
     io.kompose.service: postgres
+  name: postgres
 spec:
   replicas: 1
   selector:
@@ -13,37 +17,44 @@ spec:
     type: Recreate
   template:
     metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
       labels:
+        io.kompose.network/infra-default: "true"
         io.kompose.service: postgres
     spec:
       containers:
-        - name: postgres
-          image: ankane/pgvector
-          ports:
-            - containerPort: 5432
-          env:
-            - name: POSTGRES_USER
+        - env:
+            - name: POSTGRES_DB
               value: postgres
             - name: POSTGRES_PASSWORD
               value: postgres
-            - name: POSTGRES_DB
+            - name: POSTGRES_USER
               value: postgres
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
-          volumeMounts:
-            - name: postgres-data
-              mountPath: /var/lib/postgresql/data
+          image: ankane/pgvector
           livenessProbe:
             exec:
               command:
                 - pg_isready
                 - -U
                 - postgres
-            initialDelaySeconds: 20
+            failureThreshold: 5
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 5
+          name: postgres
+          ports:
+            - containerPort: 5432
+              hostPort: 5432
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+      restartPolicy: Always
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-data
+status: {}

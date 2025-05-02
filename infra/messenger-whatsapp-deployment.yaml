@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
+    kompose.cmd: kompose convert -f docker-compose.yml
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -17,11 +17,11 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert
+        kompose.cmd: kompose convert -f docker-compose.yml
         kompose.version: 1.31.2 (a92241f79)
       creationTimestamp: null
       labels:
-        io.kompose.network/hospede-ia-default: "true"
+        io.kompose.network/infra-default: "true"
         io.kompose.service: messenger-whatsapp
     spec:
       containers:
@@ -33,15 +33,11 @@ spec:
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
             - name: WEBHOOK_VERIFY_TOKEN
-          envFrom:
-            - configMapRef:
-                name: app-config
-            - secretRef:
-                name: app-secrets
-          image: muriloeduardo/messenger-whatsapp:latest
+          image: messenger-whatsapp
           name: messenger-whatsapp
           ports:
             - containerPort: 3000
+              hostPort: 3000
               protocol: TCP
           resources: {}
       restartPolicy: Always

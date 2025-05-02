@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
+    kompose.cmd: kompose convert -f docker-compose.yml
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -17,11 +17,11 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert
+        kompose.cmd: kompose convert -f docker-compose.yml
         kompose.version: 1.31.2 (a92241f79)
       creationTimestamp: null
       labels:
-        io.kompose.network/hospede-ia-default: "true"
+        io.kompose.network/infra-default: "true"
         io.kompose.service: rabbitmq
     spec:
       containers:
@@ -36,15 +36,16 @@ spec:
               command:
                 - rabbitmqctl
                 - status
-            initialDelaySeconds: 20
+            failureThreshold: 5
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 3
           name: rabbitmq
           ports:
             - containerPort: 5672
+              hostPort: 5672
               protocol: TCP
             - containerPort: 15672
+              hostPort: 15672
               protocol: TCP
           resources: {}
       restartPolicy: Always

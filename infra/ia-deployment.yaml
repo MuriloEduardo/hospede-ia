@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
+    kompose.cmd: kompose convert -f docker-compose.yml
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -17,11 +17,11 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert
+        kompose.cmd: kompose convert -f docker-compose.yml
         kompose.version: 1.31.2 (a92241f79)
       creationTimestamp: null
       labels:
-        io.kompose.network/hospede-ia-default: "true"
+        io.kompose.network/infra-default: "true"
         io.kompose.service: ia
     spec:
       containers:
@@ -38,28 +38,12 @@ spec:
               value: "4000"
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
-          envFrom:
-            - configMapRef:
-                name: app-config
-            - secretRef:
-                name: app-secrets
-          image: muriloeduardo/ia:latest
+          image: ia
           name: ia
           ports:
             - containerPort: 4000
+              hostPort: 4000
               protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 4000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 4000
-            initialDelaySeconds: 15
-            periodSeconds: 20
           resources: {}
       restartPolicy: Always
 status: {}
