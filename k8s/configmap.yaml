@@ -4,5 +4,6 @@ metadata:
   name: app-config
   namespace: default
 data:
-  GRAPH_NUMBER_ID: "your-graph-number-id"
-  WEBHOOK_VERIFY_TOKEN: "your-webhook-verify-token"
+  WEBHOOK_VERIFY_TOKEN: "1234567890"
+  GRAPH_NUMBER_ID: "638465516014689"
+  GRAPH_API_TOKEN: "EAAQ4idZCxZAswBO3FaQ8XJYMOp787slh0ctvNfQ0iZAHl9iOgkRcX0ZA9ZBeGSnWY4ipjze3ZAhPou21viu1QUdmHypOzNPNif5LsMgNa2Az6Ndgqrn3qPo8Tc2ZClgJKDhvIYEhSkAoIdUfxuZBtJTyAY4LDgBYWGk7hJ6UZCqrJlv7264HQeNxnuyBCWvn0m0fLcwZDZD"
