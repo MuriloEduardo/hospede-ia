@@ -27,17 +27,28 @@ spec:
       containers:
         - env:
             - name: GRAPH_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: GRAPH_API_TOKEN
             - name: GRAPH_NUMBER_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: GRAPH_NUMBER_ID
             - name: PORT
               value: "3000"
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
             - name: WEBHOOK_VERIFY_TOKEN
-          image: messenger-whatsapp
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: WEBHOOK_VERIFY_TOKEN
+          image: muriloeduardo/messenger-whatsapp
           name: messenger-whatsapp
           ports:
             - containerPort: 3000
-              hostPort: 3000
               protocol: TCP
           resources: {}
       restartPolicy: Always

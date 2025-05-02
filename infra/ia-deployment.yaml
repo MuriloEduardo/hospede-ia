@@ -33,16 +33,23 @@ spec:
             - name: LANGCHAIN_TRACING_V2
               value: "true"
             - name: LANGSMITH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: LANGSMITH_API_KEY
             - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: OPENAI_API_KEY
             - name: PORT
               value: "4000"
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
-          image: ia
+          image: muriloeduardo/ia
           name: ia
           ports:
             - containerPort: 4000
-              hostPort: 4000
               protocol: TCP
           resources: {}
       restartPolicy: Always
