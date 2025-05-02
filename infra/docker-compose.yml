@@ -16,7 +16,7 @@ services:
 
   ia:
     build:
-      context: ./services/ia
+      context: ../services/ia
     container_name: ia
     ports:
       - "4000:4000"
@@ -34,7 +34,7 @@ services:
 
   messenger-whatsapp:
     build:
-      context: ./services/messenger-whatsapp
+      context: ../services/messenger-whatsapp
     container_name: messenger-whatsapp
     ports:
       - "3000:3000"
