@@ -1,0 +1,27 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ia-tls-cert
+  namespace: default
+spec:
+  secretName: ia-tls-cert
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: ia.hospedeiaonline.com
+  dnsNames:
+    - ia.hospedeiaonline.com
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: messenger-whatsapp-tls-cert
+  namespace: default
+spec:
+  secretName: messenger-whatsapp-tls-cert
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: messenger-whatsapp.hospedeiaonline.com
+  dnsNames:
+    - messenger-whatsapp.hospedeiaonline.com

@@ -6,7 +6,8 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - http:
+    - host: messenger-whatsapp.hospedeiaonline.com
+      http:
         paths:
           - path: /
             pathType: Prefix
@@ -15,3 +16,7 @@ spec:
                 name: messenger-whatsapp
                 port:
                   number: 3000
+  tls:
+    - hosts:
+        - messenger-whatsapp.hospedeiaonline.com
+      secretName: messenger-whatsapp-tls-cert

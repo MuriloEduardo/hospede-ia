@@ -6,7 +6,8 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - http:
+    - host: ia.hospedeiaonline.com
+      http:
         paths:
           - path: /
             pathType: Prefix
@@ -15,3 +16,7 @@ spec:
                 name: ia
                 port:
                   number: 4000
+  tls:
+    - hosts:
+        - ia.hospedeiaonline.com
+      secretName: ia-tls-cert
