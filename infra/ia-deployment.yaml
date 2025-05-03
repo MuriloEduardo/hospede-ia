@@ -46,7 +46,7 @@ spec:
               value: "4000"
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbitmq:5672
-          image: muriloeduardo/ia
+          image: muriloeduardo/ia:latest
           imagePullPolicy: Always
           name: ia
           ports:

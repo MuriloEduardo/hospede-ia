@@ -45,7 +45,7 @@ spec:
                 configMapKeyRef:
                   name: app-config
                   key: WEBHOOK_VERIFY_TOKEN
-          image: muriloeduardo/messenger-whatsapp
+          image: muriloeduardo/messenger-whatsapp:latest
           imagePullPolicy: Always
           name: messenger-whatsapp
           ports:
