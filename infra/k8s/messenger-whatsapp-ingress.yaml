@@ -5,6 +5,11 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: gce
+  tls:
+    - hosts:
+        - messenger-whatsapp.hospedeiaonline.com
+      secretName: messenger-whatsapp-tls-cert
   rules:
     - host: messenger-whatsapp.hospedeiaonline.com
       http:
@@ -16,7 +21,3 @@ spec:
                 name: messenger-whatsapp
                 port:
                   number: 3000
-  tls:
-    - hosts:
-        - messenger-whatsapp.hospedeiaonline.com
-      secretName: messenger-whatsapp-tls-cert
