@@ -1,7 +1,7 @@
 import amqp from "amqplib";
 import dotenv from "dotenv";
 import express from "express";
-import createRouter from "./http.js";
+import router from "./http.js";
 import { processMessage } from './services/aiProcessor.js';
 
 dotenv.config();
@@ -12,14 +12,11 @@ app.use(express.json());
 
 app.get('/', (req, res) => res.status(200).send('ok'));
 
-(async () => {
-    const router = await createRouter();
-    app.use("/api", router);
+app.use("/api", router);
 
-    app.listen(process.env.PORT || 4000, () => {
-        console.log(`Server is listening on port: ${process.env.PORT || 4000}`);
-    });
-})();
+app.listen(process.env.PORT || 4000, () => {
+    console.log(`Server is listening on port: ${process.env.PORT || 4000}`);
+});
 
 (async () => {
     const INPUT_QUEUE = "incoming.messages";
